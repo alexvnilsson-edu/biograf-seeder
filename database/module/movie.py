@@ -11,11 +11,9 @@ def create(
     else:
         cursor_close = False
 
-    data = (title, production_year, release_year)
-
     movie_id = None
 
-    cursor.callproc("InsertMovie", data)
+    cursor.callproc("InsertMovie", [title, production_year, release_year, 0])
     movie_id = cursor.lastrowid
 
     if movie_id is None:
