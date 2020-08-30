@@ -11,11 +11,11 @@ from database.errors import DbQueryError
 )
 @click.option("--utgivning", required=True, help="Året då filmen utgavs (4 siffror).")
 def cli(titel, genre, produktion, utgivning):
-    genrer = ", ".join(genre)
-    click.echo(f"skapa film '{titel}', genre(r): '{genrer}'")
-
     try:
         movie_id = movie.create(titel, produktion, utgivning)
+        click.echo(
+            f"Skapade film [ ID = {movie_id}, Titel = {titel}, ProduktionÅr = {produktion}, UtgivningÅr = {utgivning} ]."
+        )
     except DbQueryError as e:
         print(f"Kunde inte skapa filmen '{titel}' ({e}).")
 
