@@ -13,8 +13,9 @@ def create(
 
     movie_id = None
 
-    cursor.callproc("InsertMovie", [title, production_year, release_year, 0])
-    movie_id = cursor.lastrowid
+    try:
+        result = cursor.callproc("InsertMovie", [title, production_year, release_year, 0])
+        movie_id = result[3]
 
     if movie_id is None:
         raise Exception("movie_id är None.")
