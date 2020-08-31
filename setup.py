@@ -4,7 +4,7 @@ deps = ["click", "python-dotenv", "mysql-connector-python"]
 
 setup(
     name="biograf",
-    version="0.0.1",
+    version="0.1.0",
     py_modules=[
         "biograf",
     ],
