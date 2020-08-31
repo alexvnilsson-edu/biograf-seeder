@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-deps = ["click >= 7.1.2", "mysql-connector-python >= 8.0.21"]
+deps = ["click", "mysql-connector-python"]
 
 setup(
     name="biograf",
