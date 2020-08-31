@@ -78,7 +78,7 @@ function try_venv_activate() {
     if [[ -d "${venv_path}" ]]; then
         source $venv_path/bin/activate
     else
-        echo "Hittade ingen virtualenv."
+        debucho "Hittade ingen virtualenv."
     fi
 }
 
@@ -86,11 +86,11 @@ function check_venv_active() {
     arg_retry=${1:-"retry-once"}
 
     if [[ $venv_active = 0 ]]; then
-        echo "Försöker aktivera..."
+        debucho "Försöker aktivera..."
         if [ "$arg_retry" != "no-retry" ]; then
             (try_venv_activate && echo "OK" && check_venv && check_venv_active "no-retry") || echo "Failed"
         else
-            echo "Skippar återförsök pågrund av möjlig oändlig loop."
+            debucho "Skippar återförsök pågrund av möjlig oändlig loop."
         fi
         
     fi
@@ -138,13 +138,8 @@ function app-sdist() {
 
 function app-bumpversion() {
     exec_args="${@:1}"
-    debucho "app-bumpversion"
 
-    bumpversion release $exec_args
-}
-
-function app-test() {
-    debucho "app-test"
+    bumpversion release $exec_args --allow-dirty
 }
 
 function app-help() {
@@ -164,10 +159,6 @@ do
         # ;;
         install | sdist | bumpversion)
             cli_set_command "$1" makeBadUsage
-            shift
-        ;;
-        test)
-            cli_set_command test makeBadUsage
             shift
         ;;
         --dry-run)
