@@ -1,6 +1,170 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-source .venv/bin/activate
-rm -rf build dist || echo "" > /dev/null
-pip install -r requirements.txt
-python setup.py install
+SCRIPT=$(basename "$0")
+VERSION="0.1.0"
+
+function version
+{
+    local txt=(
+        "$SCRIPT version $VERSION"
+    )
+
+    printf "%s\n" "${txt[@]}"
+}
+
+function usage
+{
+    local txt=(
+        "Utility $SCRIPT for doing stuff."
+        "Usage: $SCRIPT [options] <command> [arguments]"
+        ""
+        "Commands:"
+        "  build                setup.py build."
+        "  install              setup.py install."
+        "  sdist [anything]     setup.py sdist [bdist_wheel]."
+        ""
+        "Options:"
+        "  --help, -h     Print help."
+        "  --version, -v  Print version."
+    )
+
+    printf "%s\n" "${txt[@]}"
+}
+
+function badUsage
+{
+    local message="$1"
+    local txt=(
+        "For an overview of the command, execute:"
+        "$SCRIPT --help"
+    )
+
+    [[ $message ]] && printf "$message\n"
+
+    printf "%s\n" "${txt[@]}"
+}
+
+# Lokala variabler.
+python=python3
+setuptools=setup.py
+venv_path=.venv
+
+
+# Lokala flaggor.
+venv_active=check_venv
+venv_attempted_activation=0
+
+# Lokala funktioner.
+function check_venv() {
+    venv_active=$($python -c 'import os,sys; print(1 if os.getenv("VIRTUAL_ENV") is not None else 0)')
+}
+
+# Interna funktioner.
+function try_venv_activate() {
+    if [[ -d "${venv_path}" ]]; then
+        source $venv_path/bin/activate
+    else
+        echo "Hittade ingen virtualenv."
+    fi
+}
+
+function check_venv_active() {
+    arg_retry=${1:-"retry-once"}
+
+    if [[ $venv_active = 1 ]]; then
+        echo "[virtualenv] Aktiv"
+    else
+        echo "[virtualenv] Inaktiv"
+        echo "Försöker aktivera..."
+        if [ "$arg_retry" != "no-retry" ]; then
+            (try_venv_activate && echo "OK" && check_venv && check_venv_active "no-retry") || echo "Failed"
+        else
+            echo "Skippar återförsök pågrund av möjlig oändlig loop."
+        fi
+        
+    fi
+}
+
+function clean_build() {
+    rm -rf build dist || echo "" > /dev/null
+}
+
+function run_pip() {
+    cmd=`$python -m pip $1 $*`
+    echo "$cmd"
+}
+
+function setup_build() {
+    exec_args="${@:1}"
+    $python $setuptools build $exec_args
+}
+
+function setup_sdist() {
+    exec_args="${@:1}"
+    $python $setuptools sdist bdist_wheel $exec_args
+}
+
+function setup_install() {
+    exec_args="${@:1}"
+    $python $setuptools install $exec_args
+}
+
+function app-install() {
+    echo "app-install"
+    check_venv_active
+    
+    #run_pip "install" "-r requirements.txt"
+    #setup_build "--verbose" && setup_install "--verbose"
+}
+
+# Läs in argument och alternativ.
+while (( $# )); do
+    case "$1" in
+        install)
+            command=$1
+            shift
+            app-$command $*
+            exit 0
+        ;;
+        --help|-h)
+            usage
+            exit 0
+        ;;
+        --version|-v)
+            version
+            exit 0
+        ;;
+        *) badUsage "Option/command not recognized."; exit 1 ;;
+    esac
+done
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -i|--install) install=1 ;;
+        -v|--verbose) verbose=1 ;;
+        #-o|--option) option_flag=1 ;;
+        #-o|--option) option_arg="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+
+
+# rm -rf build dist || echo "" > /dev/null
+# pip install -r requirements.txt
+
+# if [[ $verbose = 1 ]]; then
+#     setup_build "--verbose"
+# else
+#     setup_build
+# fi
+
+# if [[ $install = 1 ]]; then
+#     if [[ $verbose = 1 ]]; then
+#         setup_install "--verbose"
+#     else
+#         setup_install
+#     fi
+# fi

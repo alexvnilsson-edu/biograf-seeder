@@ -8,8 +8,7 @@ setup(
     py_modules=[
         "biograf",
     ],
-    packages=find_packages(),
-    include_package_data=True,
+    packages=find_packages(include=["biograf_seeder", "biograf_seeder.*"]),
     install_requires=deps,
     entry_points="""
         [console_scripts]
