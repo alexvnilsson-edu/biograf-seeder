@@ -1,9 +1,9 @@
-from . import click, cli
-from database.module import genre
-from database.errors import DbQueryError
+from . import cli as _cli, click
+from biograf_seeder.database.module import genre
+from biograf_seeder.database.errors import DbQueryError
 
 
-@cli.command(name="ny", no_args_is_help=True)
+@_cli.command(name="ny", no_args_is_help=True)
 @click.option("--namn", required=True, help="Beteckningen av genren.")
 @click.option("--beskrivning", required=False, help="Beskrivning av genren.")
 def cli(namn, beskrivning):

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source .venv/bin/activate
+rm -rf build dist || echo "" > /dev/null
+pip install -r requirements.txt
+python setup.py install

@@ -1,9 +1,9 @@
-from . import click, cli
-from database.module import movie
-from database.errors import DbQueryError
+from . import cli as _cli, click
+from biograf_seeder.database.module import movie
+from biograf_seeder.database.errors import DbQueryError
 
 
-@cli.command(name="ny", no_args_is_help=True)
+@_cli.command(name="ny", no_args_is_help=True)
 @click.option("--titel", required=True, help="Filmens titel.")
 @click.option("--genre", multiple=True, help="Genre som filmen tillhör.")
 @click.option(

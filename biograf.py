@@ -1,13 +1,11 @@
-#!/usr/bin/python3
-
 import click
-from core import commands
+from biograf_seeder.core import commands
 
 
 @click.group(
     context_settings={"help_option_names": ["-h", "--help"]},
     help="Your CLI",
-    commands=commands.get_pkg_commands("commands"),
+    commands=commands.get_pkg_commands("biograf_seeder.commands"),
 )
 def cli():
     pass

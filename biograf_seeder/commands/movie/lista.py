@@ -1,10 +1,10 @@
-from . import click, cli
-from database.module import movie
-from database.errors import DbQueryError
-from core.output import Table
+from . import cli as _cli, click
+from biograf_seeder.database.module import movie
+from biograf_seeder.database.errors import DbQueryError
+from biograf_seeder.core.output import Table
 
 
-@cli.command(name="lista")
+@_cli.command(name="lista")
 def cli():
     movies = movie.list()
     table_header = ["ID", "Titel", "OrginalTitel", "ProduktionÅr", "UtgivningÅr"]

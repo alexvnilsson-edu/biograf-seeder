@@ -1,8 +1,13 @@
 from typing import List
-from .. import make_cursor, commit, MySQLCursor
-from ..errors import NotFoundError, DbQueryError
+from biograf_seeder.database import (
+    make_cursor,
+    commit,
+    MySQLCursor,
+    DbQueryError,
+    NotFoundError,
+)
 
-from ..types import Genre
+from biograf_seeder.database.types import Genre
 
 
 def find(
@@ -20,12 +25,12 @@ def find(
         result_args = cursor.callproc("FindMovieGenre", [name, 0])
 
         film_genre_id = result_args[1]
-    except Exception as e:
+    except Exception:
         raise
 
     if film_genre_id is None and create_if_not_exist == True:
         # Skapa ny genre om den inte finns.
-        film_genre_id = create_genre(name, name, cursor)
+        film_genre_id = create(name, name, cursor)
 
     if cursor_close == True:
         commit()

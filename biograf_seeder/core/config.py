@@ -2,7 +2,7 @@ import os
 import dotenv
 
 try:
-    dotenv_file = dotenv.find_dotenv('.env', raise_error_if_not_found=True)
+    dotenv_file = dotenv.find_dotenv(".env", usecwd=True)
 except IOError:
     print("Kunde inte hitta .env-fil.")
 

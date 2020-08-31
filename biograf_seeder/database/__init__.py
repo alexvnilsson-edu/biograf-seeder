@@ -2,8 +2,12 @@ import sys
 import mysql.connector
 from mysql.connector import Error
 from mysql.connector.cursor_cext import CMySQLCursor as MySQLCursor
-from core import config
-from .errors import DbConnectionError
+from biograf_seeder.core import config
+from biograf_seeder.database.errors import (
+    DbConnectionError,
+    DbQueryError,
+    NotFoundError,
+)
 
 
 def __connect(*args, **kwargs):
@@ -11,7 +15,7 @@ def __connect(*args, **kwargs):
     connection_error = None
     try:
         connection = mysql.connector.connect(*args, **kwargs)
-    except Error as e:
+    except Error:
         raise DbConnectionError(connection_error)
 
     return connection

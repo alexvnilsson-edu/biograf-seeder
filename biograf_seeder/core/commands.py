@@ -25,11 +25,12 @@ def get_pkg_commands(pkg):
     for module in pkgutil.iter_modules([pkg_path]):
         module_name = module.name
         module_instance = importlib.import_module(f"{pkg}.{module_name}")
+        print(module_instance)
 
         if not module.ispkg:
             module_command_name = get_module_group_name(module, module_instance)
             cli_name = module_instance.cli.name
-            pkg_commands[module_instance.cli.name] = module_instance.cli
+            pkg_commands[cli_name] = module_instance.cli
         else:
             module_command_name = get_module_group_name(module, module_instance)
             pkg_commands[module_command_name.replace("_", "-")] = click.Group(
