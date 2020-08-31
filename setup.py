@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-deps = ["click", "mysql-connector-python"]
+deps = ["click", "python-dotenv", "mysql-connector-python"]
 
 setup(
     name="biograf",
