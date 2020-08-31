@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT=$(basename "$0")
+VERSION="0.1.0"
+
+function version
+{
+    local txt=(
+        "$SCRIPT version $VERSION"
+    )
+
+    printf "%s\n" "${txt[@]}"
+}
+
+function usage
+{
+    local txt=(
+        "$SCRIPT -- Publicering av setuptools-projekt."
+        "Usage: $SCRIPT [options] <command> [arguments]"
+        ""
+        "Options:"
+        "  --repository, -r      Vilket PyPi-repositorie att publicera till."
+        "  --help, -h            Visa denna hjälptext."
+    )
+
+    printf "%s\n" "${txt[@]}"
+}
+
+function badUsage
+{
+    local message="$1"
+    local txt=(
+        "For an overview of the command, execute:"
+        "$SCRIPT --help"
+    )
+
+    [[ $message ]] && printf "$message\n"
+
+    printf "%s\n" "${txt[@]}"
+}
+
+# Variabler.
+pypi_repo=testpypi
+
+# Läs in alternativ.
+while (( $# ))
+do
+    case "$1" in
+        --repository|-r)
+            pypi_repo="$2"
+            shift
+        ;;
+        *)
+            badUsage "Ogilltigt alternativ angivet."
+            exit 1
+        ;;
+    esac
+done
+
+source ./build_tools/cli.sh
+
+[[ check_venv_active ]] && (run_python_script "twine" "upload" "--repository ${pypi_repo}" "dist/*") || echo "Fel"
