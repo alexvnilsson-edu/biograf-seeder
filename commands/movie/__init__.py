@@ -1,6 +1,6 @@
 import click
 
 
-@click.group(name="skapa")
+@click.group(name="film")
 def cli():
     pass

@@ -4,8 +4,9 @@ import importlib
 import pkgutil
 
 
-def get_module_group_name(module: pkgutil.ModuleInfo,
-                          instance: pkgutil.ModuleType) -> str:
+def get_module_group_name(
+    module: pkgutil.ModuleInfo, instance: pkgutil.ModuleType
+) -> str:
     if not hasattr(instance, "cli"):
         raise Exception(f"Need attribute 'cli' in {module.name}.")
 
@@ -26,16 +27,19 @@ def get_pkg_commands(pkg):
         module_instance = importlib.import_module(f"{pkg}.{module_name}")
 
         if not module.ispkg:
-            module_command_name = get_module_group_name(
-                module, module_instance)
+            module_command_name = get_module_group_name(module, module_instance)
             cli_name = module_instance.cli.name
             pkg_commands[module_instance.cli.name] = module_instance.cli
         else:
-            module_command_name = get_module_group_name(
-                module, module_instance)
+            module_command_name = get_module_group_name(module, module_instance)
             pkg_commands[module_command_name.replace("_", "-")] = click.Group(
-                context_settings={'help_option_names': ['-h', '--help']},
+                context_settings={"help_option_names": ["-h", "--help"]},
+                options_metavar="<options>",
+                no_args_is_help=True,
+                add_help_option=False,
+                subcommand_metavar="command",
                 help=module_instance.__doc__,
-                commands=get_pkg_commands(f"{pkg}.{module.name}"))
+                commands=get_pkg_commands(f"{pkg}.{module.name}"),
+            )
 
     return pkg_commands

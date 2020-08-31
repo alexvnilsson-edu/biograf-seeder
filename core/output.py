@@ -1,21 +1,6 @@
-from typing import List as __List
+from typing import List
 import click as click
 from tabulate import tabulate as tabulate
-
-
-def print_table(rows: __List, header_row: __List = None, numalign: str = "left"):
-    table_rows = []
-
-    if header_row is not None:
-        table_rows.append(header_row)
-
-    for row in rows:
-        table_rows.append(row)
-
-    if header_row is None:
-        __click.echo(__tabulate(table_rows, numalign="left"))
-    else:
-        __click.echo(__tabulate(table_rows, headers="firstrow", numalign="left"))
 
 
 class Table(object):

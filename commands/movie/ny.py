@@ -3,7 +3,7 @@ from database.module import movie
 from database.errors import DbQueryError
 
 
-@cli.command(name="film")
+@cli.command(name="ny", no_args_is_help=True)
 @click.option("--titel", required=True, help="Filmens titel.")
 @click.option("--genre", multiple=True, help="Genre som filmen tillhör.")
 @click.option(
