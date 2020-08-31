@@ -1,7 +1,7 @@
 from . import click, cli
 from database.module import movie
 from database.errors import DbQueryError
-from core.output import print_table, Table
+from core.output import Table
 
 
 @cli.command(name="lista")

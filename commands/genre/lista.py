@@ -1,7 +1,7 @@
 from . import click, cli as group
 from database.module import genre
 from database.errors import DbQueryError
-from core.output import print_table, Table
+from core.output import Table
 
 
 @group.command(name="lista")
