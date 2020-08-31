@@ -58,12 +58,17 @@ function try_venv_activate() {
     fi
 }
 
+CHECK_NO_RETRY=0
+CHECK_RETRY_ONCE=1
+
+
 function check_venv_active() {
-    arg_retry=${1:-"retry-once"}
+    default_retry="${CHECK_VENV_OPTIONS[CHECK_NO_RETRY]}"
+    arg_retry=${1:-$CHECK_RETRY_ONCE}
 
     if [[ $venv_active != 1 ]]; then
-        if [ "$arg_retry" != "no-retry" ]; then
-            (try_venv_activate && debucho "OK" && check_venv && check_venv_active "no-retry") || (debucho "Fel" && exit 1)
+        if [[ $arg_retry -eq $CHECK_NO_RETRY ]]; then
+            (try_venv_activate && debucho "OK" && check_venv && check_venv_active $CHECK_NO_RETRY) || (debucho "Fel" && exit 1)
         else
             debucho "Skippar återförsök pågrund av möjlig oändlig loop."
             exit 1
