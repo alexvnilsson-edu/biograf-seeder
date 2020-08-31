@@ -52,6 +52,7 @@ venv_path=.venv
 
 
 # Lokala flaggor.
+verbose=1 # På by default just nu
 venv_active=check_venv
 venv_attempted_activation=0
 
@@ -72,10 +73,7 @@ function try_venv_activate() {
 function check_venv_active() {
     arg_retry=${1:-"retry-once"}
 
-    if [[ $venv_active = 1 ]]; then
-        echo "[virtualenv] Aktiv"
-    else
-        echo "[virtualenv] Inaktiv"
+    if [[ $venv_active = 0 ]]; then
         echo "Försöker aktivera..."
         if [ "$arg_retry" != "no-retry" ]; then
             (try_venv_activate && echo "OK" && check_venv && check_venv_active "no-retry") || echo "Failed"
@@ -111,45 +109,76 @@ function setup_install() {
 }
 
 function app-install() {
-    echo "app-install"
+    clean_build
     check_venv_active
-    
-    #run_pip "install" "-r requirements.txt"
-    #setup_build "--verbose" && setup_install "--verbose"
+    try_venv_activate
+    run_pip "install" "--requirement requirements.txt"
+
+    [[ $verbose = 1 ]] && (setup_build "--verbose" && setup_install "--verbose") || (setup_build && setup_build)
 }
 
-# Läs in argument och alternativ.
-while (( $# )); do
+function app-sdist() {
+    clean_build
+    check_venv_active
+    try_venv_activate
+    run_pip install "--requirement requirements.txt"
+    [[ $verbose = 1 ]] && (setup_sdist "--verbose") || (setup_sdist)
+}
+
+function app-help() {
+    usage
+    exit 0
+}
+
+arg_command=help
+
+# Läs in alternativ.
+while (( $# ))
+do
     case "$1" in
         install)
-            command=$1
+            arg_command=install
             shift
-            app-$command $*
-            exit 0
         ;;
-        --help|-h)
+        sdist)
+            arg_command=sdist
+            shift
+        ;;
+        --verbose | -V)
+            verbose=1
+            shift
+        ;;
+        --help | -h)
             usage
             exit 0
         ;;
-        --version|-v)
+        --version | -v)
             version
             exit 0
         ;;
-        *) badUsage "Option/command not recognized."; exit 1 ;;
+        *)
+            badUsage "Ogilltigt alternativ angivet."
+            exit 1
+        ;;
     esac
 done
 
-while [[ "$#" -gt 0 ]]; do
-    case $1 in
-        -i|--install) install=1 ;;
-        -v|--verbose) verbose=1 ;;
-        #-o|--option) option_flag=1 ;;
-        #-o|--option) option_arg="$2"; shift ;;
-        *) echo "Unknown parameter passed: $1"; exit 1 ;;
-    esac
-    shift
-done
+if [[ $arg_command = "help" ]]; then
+    usage
+    exit 0
+fi
 
+command_func=app-$arg_command
+
+if [[ ! -z "$arg_command" ]]; then
+    if [ "$(type -t ${command_func})" = 'function' ]; then
+        $command_func "${@:1}"
+    else
+        echo "Hittade inte funktionen ${command_func}."
+    fi
+else
+    badUsage
+fi
 
 
 # rm -rf build dist || echo "" > /dev/null
