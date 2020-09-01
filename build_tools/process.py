@@ -28,7 +28,7 @@ def has_kwarg_and_type(expecting: dict, key: str, value: Any) -> bool:
         raise Exception(f"{key} finns inte i registret.")
 
     if not hasattr(expecting[key], "type"):
-        raise Exception(f"{key}-objektet har inte förväntat attribut 'type'.")
+        return True
 
     if not isinstance(value, getattr(expecting.get(key), "type")):
         raise TypeError(
@@ -41,23 +41,38 @@ def has_kwarg_and_type(expecting: dict, key: str, value: Any) -> bool:
 class Process(object):
     expecting_kwargs = {
         "shell": NamedParam(type=bool, default=False),
-        "check": NamedParam(type=bool, default=False),
+        "check": NamedParam(type=bool, default=True),
+        "stdout": NamedParam(type=int, default=0),
+        "stderr": NamedParam(type=int, default=0),
     }
 
     def add_argument(self, *args):
         for __arg in args:
             self.cmd.append(__arg)
 
-    def run(self):
-        subprocess.run(
-            self.cmd, shell=self.get_option("shell"), check=self.get_option("check")
-        )
-
     def get_option(self, key: str, default_value: Any = None):
         if hasattr(self.expecting_kwargs[key], "default"):
             default_value = getattr(self.expecting_kwargs[key], "default")
 
         return getattr(self, key, default_value)
+
+    def run(self) -> subprocess.CompletedProcess:
+        try:
+            p = subprocess.run(
+                self.cmd,
+                shell=self.get_option("shell"),
+                check=self.get_option("check"),
+                stdout=self.get_option("stdout"),
+                stderr=self.get_option("stderr"),
+            )
+        except subprocess.CalledProcessError:
+            raise
+        except subprocess.TimeoutExpired:
+            raise
+        except Exception:
+            raise
+
+        return p
 
     def __init__(self, *args, **kwargs):
         self.cmd = []
