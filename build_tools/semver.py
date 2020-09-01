@@ -8,11 +8,11 @@ class SemverParamType(click.ParamType):
     def convert(self, value: str, param, ctx) -> str:
         try:
             pattern = re.compile(self.re_pattern)
-            matched = pattern.match(value)
-
-            return str(value)
+            pattern.match(value)
         except Exception as e:
             self.fail(e)
+
+        return str(value)
 
 
 SEMVER = SemverParamType()
